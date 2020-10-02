@@ -7,8 +7,11 @@ const regSeason = async () => {
     gamesList.data.data.forEach(async (el, i, array) => {
       const res = await axios.get(`https://www.balldontlie.io/api/v1/stats?game_ids[]=${el.id}&per_page=100`);
       res.data.data.forEach((el) => {
-        if (el.pts > 45 || (el.player.last_name === "Doncic" && (el.pts > 30 || el.ast > 15))) {
-          gamesToWatch.push(el.game.id);
+        if ((el.pts > 45 && el.pts <= 50) || (el.player.last_name === "Doncic" && ((el.pts > 30 && el.pts <= 50) || (el.ast > 15 && el.ast < 20)))) {
+          gamesToWatch.push({ id: el.game.id, greatGame: false });
+        }
+        if (el.pts > 50 || el.ast >= 20) {
+          gamesToWatch.push({ id: el.game.id, greatGame: true });
         }
       });
       if (i === array.length - 1) resolve();
@@ -16,10 +19,16 @@ const regSeason = async () => {
   });
   analyzeStats.then(() => {
     if (gamesToWatch.length === 0) console.log("No games stand out.");
-    gamesList.data.data.forEach((el) => {
-      if (gamesToWatch.includes(el.id)) {
-        console.log(`You should probably watch ${el.visitor_team.abbreviation} @ ${el.home_team.abbreviation}`);
-      }
+    gamesList.data.data.forEach((game) => {
+      gamesToWatch.forEach((el) => {
+        if (game.id === el.id) {
+          if (el.greatGame) {
+            console.log(`You should REALLY watch ${game.visitor_team.abbreviation} @ ${game.home_team.abbreviation}`);
+          } else {
+            console.log(`You should probably watch ${game.visitor_team.abbreviation} @ ${game.home_team.abbreviation}`);
+          }
+        }
+      });
     });
   });
 };
