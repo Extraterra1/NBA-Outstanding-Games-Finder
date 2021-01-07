@@ -1,7 +1,10 @@
 const axios = require("axios");
+const moment = require("moment");
+
+const date = moment().subtract(1, "days").format("YYYY-MM-DD");
 
 const regSeason = async () => {
-  const gamesList = await axios.get("https://www.balldontlie.io/api/v1/games?start_date=2019-11-08&end_date=2019-11-08");
+  const gamesList = await axios.get(`https://www.balldontlie.io/api/v1/games?start_date=${date}&end_date=${date}`);
   let gamesToWatch = [];
   const analyzeStats = new Promise((resolve, reject) => {
     gamesList.data.data.forEach(async (el, i, array) => {
